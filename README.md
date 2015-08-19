@@ -31,13 +31,13 @@ This program requires python 2.7 and pydicom. Once the program is started with:
 
 it will daemon-ize itself (work in the background) and wait for DICOM files. The reason why this program is relatively fast is that the script does not need to be restarted for every image that arrives. On our machines this solution can distribute images to our study directories as fast as they arrive. The easiest way to make sure the program runs is to install it as a cronjob:
 
-   crontab -e
-   */10 * * * * /usr/bin/python2.7 processSingleFile.py start
+	crontab -e
+	*/10 * * * * /usr/bin/python2.7 processSingleFile.py start
 
 In order to tell the program to process (look at the DICOM tags and decide where to put the slice) we write some information into a named pipe the programs listens to. Here an example controlled by dcmtk's storescp as DICOM listener:
 
-   pipe=/tmp/.processSingleFilePipe
-   /usr/pubsw/packages/dcmtk/3.6.0/bin/storescp --fork \
+	pipe=/tmp/.processSingleFilePipe
+	/usr/pubsw/packages/dcmtk/3.6.0/bin/storescp --fork \
                                                 --write-xfer-little \
                                                 --exec-on-reception "echo '#a,#c,#r,#p,#f' >$pipe" \
                                                 --sort-on-study-uid scp \
