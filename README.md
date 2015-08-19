@@ -1,9 +1,9 @@
 DICOM ROUTER
 ============
 
-DICOM series are still mainly stored as single slices which creates hundereds of images for each of our advanced MRI image series (RSI/DTI/fMRI). This is an attempt to create a fast solution that can distribute DICOM files as fast as they can be received over our network.
+DICOM series are still mainly stored as single slices which creates thousands of images for each of our advanced MRI image series (RSI/DTI/fMRI). This program is an attempt to create a fast solution that can distribute DICOM files to destination directories as fast as they can be received over our network.
 
-The program detects the end of a study and sends out an email.:
+The program detects the end of a study and sends out an email:
 
     BTUANON TRANSFER SUCCESS
     BTUANON: MMILREC TRANSFER SUCCESS for 1 files (total number of files received: 4707)
@@ -15,7 +15,7 @@ The file is controlled by routes stored in a separate json file in the local dir
     [
       { "AETITLE" : "BTUANON",
         "PATH" : "/space/md8/3/data/MMILDB/PLING/orig",
-	"EMAIL" : [ "hbartsch@ucsd.edu" ]
+        "EMAIL" : [ "hbartsch@ucsd.edu" ]
       }
     ]
 
@@ -24,11 +24,11 @@ Installation
 
 This program requires python 2.7 and pydicom. Once started with:
 
-     python2.7 processSingleFile.py start
+     > python2.7 processSingleFile.py start
 
-it will daemon-ize itself (work in the background) and wait for DICOM slices it needs to process. The reason why this is nice is that the python script does not need to be restarted for every image that arrives. On our machines this solution can distribute images as fast as they arrive (produces a load of 0.85).
+it will daemon-ize itself (work in the background) and wait for DICOM files. The reason why this program is relatively fast is that the script does not need to be restarted for every image that arrives. On our machines this solution can distribute images to our study directories as fast as they arrive.
 
-In order to tell the program to work (e.g. look at DICOM tags and decide where to put the slice) write some information into a pipe the programs listens to. Here an example controlled by dcmtk's storescp as DICOM listener:
+In order to tell the program to process (look at the DICOM tags and decide where to put the slice) we write some information into a named pipe the programs listens to. Here an example controlled by dcmtk's storescp as DICOM listener:
 
    pipe=/tmp/.processSingleFilePipe
    /usr/pubsw/packages/dcmtk/3.6.0/bin/storescp --fork \
@@ -37,3 +37,5 @@ In order to tell the program to work (e.g. look at DICOM tags and decide where t
                                                 --sort-on-study-uid scp \
                                                 --output-directory "/tmp/archive" \
                                                 11113
+						
+The information that ends up in the pipe is the AETitle of the caller the AETitle called (appears in the routing table), the callers IP number, the path to the directory that storescp copies the DICOM files initially to and the DICOM's file name.
