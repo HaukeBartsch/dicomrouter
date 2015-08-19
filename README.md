@@ -10,7 +10,7 @@ The program detects the end of a study and sends out an email:
     study description: "MRI BRAIN WO/W CONTRAST"
     file destination: "/.../BTUAnon/.../1.2.826.0..."
 
-The file is controlled by routes stored in a separate json file in the local directory:
+The file is controlled by routes stored in a separate json file in the local directory (routes.json):
 
     [
       { "AETITLE" : "BTUANON",
