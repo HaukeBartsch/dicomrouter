@@ -6,7 +6,7 @@ DICOM series are still mainly stored as single slices which creates thousands of
 The program detects the end of a study and sends out an email:
 
     BTUANON TRANSFER SUCCESS
-    BTUANON: MMILREC TRANSFER SUCCESS for 1 files (total number of files received: 4707)
+    BTUANON: MMILREC TRANSFER SUCCESS for 4707 files (total number of files received: 4707)
     study description: "MRI BRAIN WO/W CONTRAST"
     file destination: "/.../BTUAnon/.../1.2.826.0..."
 
@@ -14,19 +14,25 @@ The file is controlled by routes stored in a separate json file in the local dir
 
     [
       { "AETITLE" : "BTUANON",
-        "PATH" : "/space/md8/3/data/MMILDB/PLING/orig",
+        "PATH" : "/space/BTU_Directory/orig",
         "EMAIL" : [ "hbartsch@ucsd.edu" ]
       }
     ]
 
+The copy operation creates a directory structure in the file destination that groups DICOM files by PatientID, StudyDate, StudyTime and SeriesInstanceUID. Each DICOM file is saved as its SOPInstanceUID.
+
+
 Installation
 ------------
 
-This program requires python 2.7 and pydicom. Once started with:
+This program requires python 2.7 and pydicom. Once the program is started with:
 
      > python2.7 processSingleFile.py start
 
-it will daemon-ize itself (work in the background) and wait for DICOM files. The reason why this program is relatively fast is that the script does not need to be restarted for every image that arrives. On our machines this solution can distribute images to our study directories as fast as they arrive.
+it will daemon-ize itself (work in the background) and wait for DICOM files. The reason why this program is relatively fast is that the script does not need to be restarted for every image that arrives. On our machines this solution can distribute images to our study directories as fast as they arrive. The easiest way to make sure the program runs is to install it as a cronjob:
+
+   crontab -e
+   */10 * * * * /usr/bin/python2.7 processSingleFile.py start
 
 In order to tell the program to process (look at the DICOM tags and decide where to put the slice) we write some information into a named pipe the programs listens to. Here an example controlled by dcmtk's storescp as DICOM listener:
 
