@@ -297,13 +297,14 @@ class ProcessSingleFile(Daemon):
                                 if not os.path.exists(fn):
 					logging.info("Create directory %s" % fn)
 					# print "Create directory: %s" % fn
-                                        os.makedirs(fn)
+                                        os.makedirs(fn, 0o755)
                                 fn2 = os.path.join(fn, dataset.SOPInstanceUID)
                                 if not os.path.exists(fn2):
 					# move that file to the new location
 					logging.info("Try to move file %s to new location %s", f, fn2)
 					try:
 						shutil.move(f, fn2)
+						os.chmod(fn2, 0o755)
 					except:
 						logging.info("move failed")
 						self.timer.addBadEvent(dataset.StudyInstanceUID, aec, fn, alertThem)
@@ -394,12 +395,12 @@ if __name__ == "__main__":
 		print ""
                 print "Use 'start' to start the daemon in the background. Don't send file names for processing using 'send',"
 		print "that would be too slow. Instead write the information about the DICOM file using bash:"
-		print "  pipe=/tmp/.processSingleFilePipe
+		print "  pipe=/tmp/.processSingleFilePipe"
 		print "  /usr/pubsw/packages/dcmtk/3.6.0/bin/storescp --fork \\"
 		print "                                               --write-xfer-little \\"
-		print "                                               --exec-on-reception "echo '#a,#c,#r,#p,#f' >$pipe" \\"
+		print "                                               --exec-on-reception \"echo '#a,#c,#r,#p,#f' >$pipe\" \\"
 		print "                                               --sort-on-study-uid scp \\"
-		print "                                               --output-directory "/tmp/archive" \\"
+		print "                                               --output-directory \"/tmp/archive\" \\"
 		print "                                               11113"
                 print "Usage:"
 		print "  python2.7 %s start|stop|restart|send" % sys.argv[0]
