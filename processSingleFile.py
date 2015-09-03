@@ -216,6 +216,10 @@ class ProcessSingleFile(Daemon):
 					aetitles.append(entry['AETITLE'])
 				if aec not in aetitles:
 					print "Error: the called AETitle \"%s\" could not be found in the list of known routes %s" % (aec, ', '.join(aetitles))
+					try:
+						os.remove(f)
+					except:
+						pass
 					continue
 				# where to we need to save the data?
 				moveFileTo = ""
@@ -242,7 +246,11 @@ class ProcessSingleFile(Daemon):
                                 except InvalidDicomError:
                                         # print("Not a DICOM file: ", f)
 					logging.info("Not a DICOM file %s", f)
-                                        continue
+					try:
+						os.remove(f)
+					except:
+						pass
+					continue
 
 				# create the file name the file will be saved under
 				try:
@@ -276,6 +284,10 @@ class ProcessSingleFile(Daemon):
                                 if not os.path.exists(outdir):
 					print "Error: the output directory %s does not exist for %s" % (outdir, aec)
 					logging.info("Error: the output directory %s does not exist for %s", outdir, aec)
+					try:
+                                                os.remove(f)
+					except:
+					        pass													
 					continue
                                 infile = os.path.basename(f)
 				# create the path to store the input file under ( this time sorting series into different directories )
@@ -315,6 +327,10 @@ class ProcessSingleFile(Daemon):
 					#print "file already at destination: %s" % fn2
 					logging.info("File already at destination: %s" % fn2)
 					self.timer.addBadEvent(dataset.StudyInstanceUID, aec, fn, StudyDescription, alertThem)
+					try:
+						os.remove(f)
+					except:
+						pass
 					continue # don't do anything because the file exists already
                 rp.close()
 
@@ -342,9 +358,13 @@ class EmailService(Thread):
 					msg['From'] = "mmilrec@ip97.ucsd.edu"
 					for name in entry[6]:
 						msg['To'] = name
-						s = smtplib.SMTP('localhost')
-						s.sendmail("mmilrec@ucsd.edu", [name], msg.as_string())
-						s.quit()
+						try:
+							s = smtplib.SMTP('localhost')
+							s.sendmail("mmilrec@ucsd.edu", [name], msg.as_string())
+							s.quit()
+						except:
+							logging.info("smtplib connection to localhost failed, could not send email")
+							pass
 										 
 			if len(listToRemove) > 0:
 				self.events = {key: value for key, value in self.events.iteritems() if key not in listToRemove}
