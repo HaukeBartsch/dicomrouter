@@ -3,6 +3,12 @@ DICOM ROUTER
 
 DICOM series are still mainly stored as single slices which creates thousands of images for each of our advanced MRI image series (RSI/DTI/fMRI). This program is an attempt to create a fast solution that can distribute DICOM files to destination directories as fast as they can be received over our network.
 
+The speed of the current solution measured on a local system with:
+
+    find <directory> -type f -print | xargs -i echo "/path/to/input/{}" >> /tmp/.processSingleFilePipe
+
+was 380 images per second.
+
 The program detects the end of a study and sends out an email:
 
     BTUANON TRANSFER SUCCESS
